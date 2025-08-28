@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_project/bottom_bar.dart';
 import 'package:fyp_project/onboarding_screen.dart';
+import 'package:fyp_project/utils/shared_preference_manager.dart';
 import 'package:fyp_project/view/screens/doctor_side/doctor_bottom_bar.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -19,56 +20,27 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     Future.delayed(const Duration(seconds: 3), () async {
-      final user = FirebaseAuth.instance.currentUser;
+      // final userId =
+      //     await SharedPreferencesManager.getUserIdFromSharedPreferences();
+      // //   final accountType = await SharedPreferencesManager.getAccountType();
 
-      // If user is not logged in → go to onboarding
-      if (user == null) {
-        if (!mounted) return;
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const OnBoardingScreen()),
-        );
-        return;
-      }
+      // if (!mounted) return;
 
-      try {
-        final snapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
-
-        if (!mounted) return;
-
-        if (snapshot.exists) {
-          final accountType = snapshot.data()?['accountType'];
-
-          if (accountType == 'Patient') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => patientBottombar(index: 0)),
-            );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => DoctorpatientBottombar(index: 0)),
-            );
-          }
-        } else {
-          // If user doc doesn't exist, go to onboarding
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const OnBoardingScreen()),
-          );
-        }
-      } catch (e) {
-        print('Error fetching account type: $e');
-        if (!mounted) return;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const OnBoardingScreen()),
-        );
-      }
+      // if (userId == null) {
+      //   Navigator.pushReplacement(
+      //     context,
+      //     MaterialPageRoute(builder: (_) => const OnBoardingScreen()),
+      //   );
+      // } else {
+      //   Navigator.pushReplacement(
+      //     context,
+      //     MaterialPageRoute(builder: (_) => DoctorpatientBottombar(index: 0)),
+      //   );
+      // }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const OnBoardingScreen()),
+      );
     });
   }
 

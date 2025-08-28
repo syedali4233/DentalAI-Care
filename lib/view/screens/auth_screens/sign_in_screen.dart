@@ -7,7 +7,7 @@ import 'package:fyp_project/constants/colors.dart';
 import 'package:fyp_project/constants/extensions_for_sizedboxed.dart';
 import 'package:fyp_project/constants/images_path.dart';
 import 'package:fyp_project/constants/styles.dart';
-import 'package:fyp_project/provider/auth_provider.dart';
+import 'package:fyp_project/view_model/auth_provider.dart';
 import 'package:fyp_project/view/screens/auth_screens/forgot_screen.dart';
 import 'package:fyp_project/view/screens/auth_screens/sign_up_screen.dart';
 import 'package:provider/provider.dart';
@@ -129,8 +129,11 @@ class _SignInScreenState extends State<SignInScreen> {
                       isLoading: value.isLoading,
                       ontap: () {
                         if (_formkey.currentState!.validate()) {
-                          value.login(emailcontroller.text,
-                              passwordcontroller.text, context);
+                          final data = {
+                            'email': emailcontroller.text,
+                            'password': passwordcontroller.text
+                          };
+                          value.loginApis(data, context);
                         }
                       });
                 },

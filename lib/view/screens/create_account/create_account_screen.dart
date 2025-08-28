@@ -1,16 +1,17 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fyp_project/bottom_bar.dart';
+
 import 'package:fyp_project/components/auth_components/button_component.dart';
 import 'package:fyp_project/components/auth_components/textfield_component.dart';
 import 'package:fyp_project/constants/colors.dart';
 import 'package:fyp_project/constants/extensions_for_sizedboxed.dart';
 import 'package:fyp_project/constants/images_path.dart';
 import 'package:fyp_project/constants/styles.dart';
-import 'package:fyp_project/provider/auth_provider.dart';
+import 'package:fyp_project/view_model/auth_provider.dart';
 import 'package:fyp_project/view/screens/auth_screens/sign_in_screen.dart';
-import 'package:fyp_project/view/screens/patient/home_screen.dart';
+import 'package:intl/intl.dart';
+
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:provider/provider.dart';
 
@@ -32,6 +33,24 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   TextEditingController emailController = TextEditingController();
   final _formkey = GlobalKey<FormState>();
   TextEditingController phoneController = TextEditingController();
+  String fullPhoneNumber = "";
+  TextEditingController dobController = TextEditingController();
+
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        dobController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     print('Data from previous screen: ${widget.data}');
@@ -87,14 +106,28 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         isLoading: value.isLoading,
                         ontap: () {
                           if (_formkey.currentState!.validate()) {
-                            value.createaccount(
-                                firstname.text,
-                                lastname.text,
-                                emailController.text,
-                                passwordcontroller.text,
-                                phoneController.text,
-                                widget.data?['accountType'] ?? '',
-                                context);
+                            // final data = {
+                            //   ...?widget.data,
+                            //   'firstName': firstname.text,
+                            //   'lastName': lastname.text,
+                            //   'email': emailController.text,
+                            //   'password': passwordcontroller.text,
+                            //   'phoneNo': "923335508864",
+                            //   'dob': '1992-11-07',
+                            //   'speciality': 'physio'
+                            // };
+                            final data = {
+                              ...?widget.data,
+                              'firstName': firstname.text,
+                              'lastName': lastname.text,
+                              'email': emailController.text,
+                              'password': passwordcontroller.text,
+                              'phoneNo': fullPhoneNumber,
+                              'dob': dobController.text,
+                              'speciality': 'physio'
+                            };
+                            print(data);
+                            value.signupApi(data, context);
                           }
                         });
                   },
@@ -160,8 +193,36 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     15.toHeight,
                     SizedBox(
                       width: 300.w,
+                      child: TextField(
+                        controller: dobController,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          labelText: "Date of Birth",
+                          suffixIcon: const Icon(Icons.calendar_today),
+                          filled: true,
+                          fillColor: Colors.grey.withOpacity(0.2),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                            borderSide: BorderSide(color: Colors.grey.shade800),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                            borderSide: const BorderSide(color: Colors.blue),
+                          ),
+                        ),
+                        onTap: () => _selectDate(context),
+                      ),
+                    ),
+                    15.toHeight,
+                    SizedBox(
+                      width: 300.w,
                       child: InternationalPhoneNumberInput(
                         onInputChanged: (PhoneNumber number) {
+                          setState(() {
+                            fullPhoneNumber = (number.phoneNumber ?? "")
+                                .replaceAll(
+                                    '+', ''); // ✅ Store correct phone number
+                          });
                           print(number.phoneNumber);
                         },
                         onInputValidated: (bool value) {

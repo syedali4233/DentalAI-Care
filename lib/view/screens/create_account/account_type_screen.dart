@@ -68,7 +68,7 @@ class _AccountTypeState extends State<AccountTypeScreen> {
                         MaterialPageRoute(
                             builder: (context) => CreateAccountScreen(
                                   data: {
-                                    'accountType': _selectedOption,
+                                    'role': _selectedOption,
                                   },
                                 )));
                     print('$_selectedOption');
@@ -94,7 +94,7 @@ class _AccountTypeState extends State<AccountTypeScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Radio<String>(
-                        value: 'Patient',
+                        value: 'patient',
                         groupValue: _selectedOption,
                         onChanged: (value) {
                           setState(() {
@@ -109,7 +109,7 @@ class _AccountTypeState extends State<AccountTypeScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Radio<String>(
-                        value: 'Nurse',
+                        value: 'nurse',
                         groupValue: _selectedOption,
                         onChanged: (value) {
                           setState(() {

@@ -9,7 +9,9 @@ import 'package:fyp_project/constants/colors.dart';
 import 'package:fyp_project/constants/extensions_for_sizedboxed.dart';
 import 'package:fyp_project/constants/images_path.dart';
 import 'package:fyp_project/constants/styles.dart';
-import 'package:fyp_project/provider/profile_provider.dart';
+import 'package:fyp_project/utils/shimmer.dart';
+import 'package:fyp_project/view_model/doctors_provider.dart';
+import 'package:fyp_project/view_model/profile_provider.dart';
 import 'package:fyp_project/view/screens/patient/top_doctor_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -61,15 +63,41 @@ class _HomeScreenState extends State<HomeScreenDoc> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    // Future.delayed(const Duration(seconds: 3), () {
+    //   showDialog(
+    //     context: context,
+    //     builder: (BuildContext context) {
+    //       return AlertDialog(
+    //         title: Text(
+    //           'Edit Profile',
+    //           style: maintext,
+    //         ),
+    //         content: Text(
+    //           'Please complete your profile',
+    //           style: simpletext,
+    //         ),
+    //         actions: [
+    //           TextButton(
+    //             onPressed: () => Navigator.of(context).pop(),
+    //             child: const Text('okay'),
+    //           ),
+    //           TextButton(
+    //             onPressed: () => Navigator.of(context).pop(),
+    //             child: const Text('Close'),
+    //           ),
+    //         ],
+    //       );
+    //     },
+    //   );
+    // });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // You can fetch initial data here if needed
-      Provider.of<ProfileProvider>(context, listen: false).fetchProfileData();
+      Provider.of<ProfileProvider>(context, listen: false).userDetails();
+      Provider.of<DoctorsProvider>(context, listen: false).getAppointmentfuc();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final profileData = Provider.of<ProfileProvider>(context).profileData;
     return Scaffold(
       body: SizedBox.expand(
         child: Stack(
@@ -110,9 +138,17 @@ class _HomeScreenState extends State<HomeScreenDoc> {
                     style: maintext.copyWith(
                         fontSize: 16.sp, fontWeight: FontWeight.w300),
                   ),
-                  Text(
-                    'Dr. ${profileData['firstname'] ?? ''} ${profileData['lastname'] ?? 'loading...'}',
-                    style: maintext.copyWith(fontSize: 14.sp),
+                  Consumer<ProfileProvider>(
+                    builder: (context, value, child) {
+                      if (value.userResponse == null) {
+                        return ShimmerComponents.textShimmer();
+                      }
+                      final user = value.userResponse!.userInfo;
+                      return Text(
+                        'Dr. ${user.fullName}',
+                        style: maintext.copyWith(fontSize: 14.sp),
+                      );
+                    },
                   ),
                   20.toHeight,
                   Text(
@@ -209,23 +245,36 @@ class _HomeScreenState extends State<HomeScreenDoc> {
                             )
                           ],
                         ),
-                        ListView.builder(
-                            shrinkWrap: true, // <— very important
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: appoints.length,
-                            itemBuilder: (context, index) {
-                              final articleview = appoints[index];
-                              return Padding(
-                                padding: EdgeInsets.symmetric(vertical: 5.h),
-                                child: AppointmentsComponents(
-                                  title: articleview['title'],
-                                  date: articleview['readtime'],
-                                  read: articleview['date'],
-                                  imagee: articleview['image'],
-                                  onclicked: istap,
-                                ),
-                              );
-                            })
+                        Consumer<DoctorsProvider>(
+                          builder: (context, value, child) {
+                            if (value.appointments == null) {
+                              return ShimmerComponents.cardShimmer();
+                            }
+                            final appoint = value.appointments!.appointments;
+                            print(appoint);
+                            return ListView.builder(
+                                shrinkWrap: true, // <— very important
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: appoint.length,
+                                itemBuilder: (context, index) {
+                                  final appointm =
+                                      value.appointments!.appointments[index];
+                                  final articleview = appoints[index];
+                                  return Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 5.h),
+                                    child: AppointmentsComponents(
+                                      title:
+                                          "${appointm.patient.firstName} ${appointm.patient.lastName}",
+                                      date: appointm.time,
+                                      read: appointm.date.toString(),
+                                      imagee: articleview['image'],
+                                      onclicked: istap,
+                                    ),
+                                  );
+                                });
+                          },
+                        )
                       ],
                     ),
                   )),

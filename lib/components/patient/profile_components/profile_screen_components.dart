@@ -34,7 +34,7 @@ class ProfileScreenComponents extends StatelessWidget {
                     child: Image.asset(
                       image,
                       scale: 5.sp,
-                      // color: Colors.white,
+                      color: maincolor,
                     ),
                   ),
                 ),

@@ -58,6 +58,8 @@ class TopDoctorComponent extends StatelessWidget {
                     style: maintext.copyWith(fontSize: 16.sp),
                   ),
                   Text(
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     field,
                     style: simpletext.copyWith(fontSize: 10.sp),
                   ),

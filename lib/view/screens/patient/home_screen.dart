@@ -6,7 +6,10 @@ import 'package:fyp_project/constants/colors.dart';
 import 'package:fyp_project/constants/extensions_for_sizedboxed.dart';
 import 'package:fyp_project/constants/images_path.dart';
 import 'package:fyp_project/constants/styles.dart';
+import 'package:fyp_project/utils/shimmer.dart';
 import 'package:fyp_project/view/screens/patient/top_doctor_screen.dart';
+import 'package:fyp_project/view_model/profile_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -37,6 +40,15 @@ class _HomeScreenState extends State<HomeScreen> {
       'readtime': '10mint read'
     }
   ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ProfileProvider>(context, listen: false).userDetails();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,9 +91,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: maintext.copyWith(
                         fontSize: 16.sp, fontWeight: FontWeight.w300),
                   ),
-                  Text(
-                    'Ruchita',
-                    style: maintext.copyWith(fontSize: 14.sp),
+                  Consumer<ProfileProvider>(
+                    builder: (context, value, child) {
+                      if (value.userResponse == null) {
+                        return ShimmerComponents.textShimmer();
+                      }
+                      final user = value.userResponse!.userInfo;
+                      return Text(
+                        user.fullName,
+                        style: maintext.copyWith(fontSize: 14.sp),
+                      );
+                    },
                   ),
                   20.toHeight,
                   Text(
@@ -143,26 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                                 3.toHeight,
-                                const Text('Top Doctors')
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: maincolor,
-                                  radius: 30.sp,
-                                  child: Transform.scale(
-                                    scale:
-                                        0.8, // Scale image inside circle (0.0 to 1.0)
-                                    child: Image.asset(
-                                      nurseLogo,
-                                      fit: BoxFit.contain,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                3.toHeight,
-                                const Text('Nurses')
+                                const Text('Top Nurses')
                               ],
                             ),
                             Column(

@@ -9,7 +9,7 @@ import 'package:fyp_project/constants/colors.dart';
 import 'package:fyp_project/constants/extensions_for_sizedboxed.dart';
 import 'package:fyp_project/constants/images_path.dart';
 import 'package:fyp_project/constants/styles.dart';
-import 'package:fyp_project/provider/auth_provider.dart';
+import 'package:fyp_project/view_model/auth_provider.dart';
 import 'package:fyp_project/view/screens/create_account/account_type_screen.dart';
 import 'package:fyp_project/view/screens/auth_screens/sign_in_screen.dart';
 
@@ -166,11 +166,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ontap: () {
                           if (_formkey.currentState!.validate()) {
                             if (isChecked) {
-                              value.signup(
-                                  emailController.text,
-                                  passwordController.text,
-                                  nameController.text,
-                                  context);
+                              // value.signup(
+                              //     emailController.text,
+                              //     passwordController.text,
+                              //     nameController.text,
+                              //     context);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const AccountTypeScreen()));
                             }
                           }
 

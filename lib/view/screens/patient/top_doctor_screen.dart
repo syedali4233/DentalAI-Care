@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fyp_project/components/patient/home_components/top_doctor_component.dart';
 import 'package:fyp_project/constants/extensions_for_sizedboxed.dart';
+import 'package:fyp_project/constants/images_path.dart';
 import 'package:fyp_project/constants/styles.dart';
+import 'package:fyp_project/utils/shimmer.dart';
 import 'package:fyp_project/view/screens/patient/doctor_details.dart';
+import 'package:fyp_project/view_model/doctors_provider.dart';
+import 'package:provider/provider.dart';
 
 class TopDoctorScreen extends StatefulWidget {
   const TopDoctorScreen({super.key});
@@ -51,6 +55,13 @@ class _TopDoctorScreenState extends State<TopDoctorScreen> {
     },
   ];
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Provider.of<DoctorsProvider>(context, listen: false).getAlldoctors();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -77,29 +88,51 @@ class _TopDoctorScreenState extends State<TopDoctorScreen> {
                 ),
               ),
               20.toHeight,
-              ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: doctors.length,
-                  itemBuilder: (context, index) {
-                    final doctor = doctors[index];
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 15.w),
-                      child: TopDoctorComponent(
+              Consumer<DoctorsProvider>(
+                builder: (context, value, child) {
+                  if (value.doctorResponse == null) {
+                    return ShimmerComponents.cardShimmer();
+                  }
+
+                  final doct = value.doctorResponse!.doctors;
+                  if (doct.isEmpty) {
+                    return const Center(child: Text('No doctors found'));
+                  }
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: doct.length,
+                    itemBuilder: (context, index) {
+                      final doctor = doct[index]; // ✅ Corrected here
+
+                      return Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 15.w),
+                        child: TopDoctorComponent(
                           ontapp: () {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const DoctorDetails()));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DoctorDetails(
+                                  id: doctor.id,
+                                ),
+                              ),
+                            );
                           },
-                          imagee: doctor['image'],
-                          title: doctor['title'],
-                          field: doctor['field'],
-                          rating: doctor['rating'],
-                          locations: doctor['location']),
-                    );
-                  })
+                          imagee: maledoctor, // ✅ Object property
+                          title:
+                              "Dr. ${doctor.firstName ?? ''} ${doctor.lastName ?? ''}",
+                          field: doctor.email ?? 'N/A',
+                          rating:
+                              "4.5", // example, add real rating if available
+                          locations:
+                              "isb", // example, add real location if available
+                        ),
+                      );
+                    },
+                  );
+                },
+              )
             ],
           ),
         ),
