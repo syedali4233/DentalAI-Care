@@ -7,6 +7,7 @@ import 'package:fyp_project/constants/colors.dart';
 import 'package:fyp_project/constants/extensions_for_sizedboxed.dart';
 import 'package:fyp_project/constants/images_path.dart';
 import 'package:fyp_project/constants/styles.dart';
+import 'package:fyp_project/view/screens/create_account/account_type_screen.dart';
 import 'package:fyp_project/view_model/auth_provider.dart';
 import 'package:fyp_project/view/screens/auth_screens/forgot_screen.dart';
 import 'package:fyp_project/view/screens/auth_screens/sign_up_screen.dart';
@@ -67,8 +68,11 @@ class _SignInScreenState extends State<SignInScreen> {
         key: _formkey,
         child: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               30.toHeight,
+              50.toHeight,
               Center(
                   child: TextfieldComponent(
                 iconimage: prefiximage,
@@ -94,31 +98,6 @@ class _SignInScreenState extends State<SignInScreen> {
                             ? Icons.visibility
                             : Icons.visibility_off,
                         color: Colors.grey)),
-              ),
-              5.toHeight,
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.w),
-                child: Align(
-                  alignment: Alignment.topRight,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              const ForgotScreen(), // Replace with your actual screen
-                        ),
-                      );
-                    },
-                    child: Text(
-                      'Forgot Password?',
-                      style: simpletext.copyWith(
-                        color: maincolor,
-                        fontSize: 13.sp,
-                      ),
-                    ),
-                  ),
-                ),
               ),
               50.toHeight,
               Consumer<AuthProvider>(
@@ -151,7 +130,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  const SignUpScreen(), // Replace with your actual screen
+                                  const AccountTypeScreen(), // Replace with your actual screen
                             ),
                           );
                         },
@@ -162,79 +141,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   ],
                 ),
               ),
-              50.toHeight,
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Row(
-                  children: [
-                    const Expanded(
-                      child: Divider(
-                        color: Colors.grey,
-                        thickness: 1,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.w),
-                      child: Text(
-                        'OR',
-                        style: simpletext,
-                      ),
-                    ),
-                    const Expanded(
-                      child: Divider(
-                        color: Colors.grey,
-                        thickness: 1,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               25.toHeight,
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 15.w),
-                height: 56.h,
-                width: 300.w,
-                decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xffE5E7EB)),
-                    borderRadius: BorderRadius.circular(6.r)),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      'assets/Google (3).png',
-                      scale: 4.sp,
-                    ),
-                    40.toWidth,
-                    Text(
-                      'Sign in with Google',
-                      style: maintext.copyWith(
-                          fontSize: 16.sp, fontWeight: FontWeight.w200),
-                    )
-                  ],
-                ),
-              ),
-              10.toHeight,
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 15.w),
-                height: 56.h,
-                width: 300.w,
-                decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xffE5E7EB)),
-                    borderRadius: BorderRadius.circular(6.r)),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      'assets/Facebook (2).png',
-                      scale: 4.sp,
-                    ),
-                    40.toWidth,
-                    Text(
-                      'Sign in with Facebook',
-                      style: maintext.copyWith(
-                          fontSize: 16.sp, fontWeight: FontWeight.w200),
-                    )
-                  ],
-                ),
-              )
             ],
           ),
         ),

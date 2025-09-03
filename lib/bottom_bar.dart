@@ -2,44 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fyp_project/constants/images_path.dart';
 import 'package:fyp_project/constants/styles.dart';
+import 'package:fyp_project/view/screens/doctor_side/doc_chat_screen.dart';
 import 'package:fyp_project/view/screens/patient/Notification_screen.dart';
 import 'package:fyp_project/view/screens/patient/Reports_screen.dart';
-import 'package:fyp_project/view/screens/patient/chat_screen_patient.dart';
+
+import 'package:fyp_project/view/screens/patient/detecion_screen.dart';
 import 'package:fyp_project/view/screens/patient/home_screen.dart';
 import 'package:fyp_project/view/screens/patient/profile_screen.dart';
-
 import '../../constants/colors.dart';
 
 class patientBottombar extends StatefulWidget {
-  patientBottombar({
-    super.key,
-    this.index,
-  });
-  int? index;
+  final int? index;
+  const patientBottombar({super.key, this.index});
+
   @override
   State<patientBottombar> createState() => _patientBottombarState();
 }
 
 class _patientBottombarState extends State<patientBottombar> {
-  int _selectedIndex = 0; // Tracks the selected index
+  int _selectedIndex = 0;
 
   @override
   void initState() {
-    // TODO: implement initState
-    _selectedIndex = widget.index!;
     super.initState();
+    _selectedIndex = widget.index ?? 0; // default to 0 if null
   }
 
-  // List of screens for each tab
   final List<Widget> _screens = [
-    //  HomeScreen(),
     const HomeScreen(),
-    const ReportsScreen(),
-    const ChatScreenPatient(),
+    const NotificationScreen(),
+    const DocChatScreen(),
     const ProfileScreen(),
   ];
 
-  // Function to handle item tap
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -62,71 +57,78 @@ class _patientBottombarState extends State<patientBottombar> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        body: _screens[_selectedIndex],
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20.r),
-              topRight: Radius.circular(20.r),
+        body: SafeArea(
+          child: _screens[_selectedIndex],
+        ),
+
+        // Floating Plus Button
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const DetecionScreen()),
+            );
+          },
+          backgroundColor: maincolor,
+          shape: const CircleBorder(),
+          child: const Icon(Icons.add, size: 28, color: Colors.white),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+
+        // ✅ Bottom NavigationBar must be inside Scaffold
+        bottomNavigationBar: BottomAppBar(
+          shape: const CircularNotchedRectangle(),
+          notchMargin: 6,
+          color: maincolor.withOpacity(0.2),
+          child: BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
+            selectedItemColor: maincolor,
+            unselectedItemColor: Colors.black,
+            showUnselectedLabels: true,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            iconSize: 22, // reduce icon size if needed
+            selectedLabelStyle: simpletext.copyWith(
+              fontWeight: FontWeight.w600,
+              color: maincolor,
+              fontSize: 12.sp,
             ),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 3,
-                offset: Offset(0, 0), // Adjust shadow direction
+            unselectedLabelStyle: simpletext.copyWith(fontSize: 11.sp),
+            items: [
+              BottomNavigationBarItem(
+                icon: Image.asset(
+                  'assets/Home.png',
+                  scale: 4.sp,
+                  color: _selectedIndex == 0 ? maincolor : Colors.black,
+                ),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Image.asset(
+                  'assets/Frame 5 (1).png',
+                  scale: 4.sp,
+                  color: _selectedIndex == 1 ? maincolor : Colors.black,
+                ),
+                label: 'Notification',
+              ),
+              BottomNavigationBarItem(
+                icon: Image.asset(
+                  chatIcon,
+                  scale: 4.sp,
+                  color: _selectedIndex == 2 ? maincolor : Colors.black,
+                ),
+                label: 'Chats',
+              ),
+              BottomNavigationBarItem(
+                icon: Image.asset(
+                  'assets/Profile.png',
+                  scale: 4.sp,
+                  color: _selectedIndex == 3 ? maincolor : Colors.black,
+                ),
+                label: 'Profile',
               ),
             ],
-          ),
-          height: 68.h,
-          child: ClipRRect(
-            child: BottomNavigationBar(
-              currentIndex: _selectedIndex,
-              onTap: _onItemTapped,
-              selectedItemColor: maincolor,
-              unselectedItemColor: Colors.grey,
-              selectedLabelStyle: simpletext.copyWith(
-                  fontWeight: FontWeight.w600, color: maincolor),
-              unselectedLabelStyle: simpletext,
-              showUnselectedLabels: true,
-              backgroundColor: Colors.white,
-              elevation: 0, // Elevation moved to container
-              type: BottomNavigationBarType.fixed,
-              items: [
-                BottomNavigationBarItem(
-                  icon: Image.asset(
-                    'assets/Home.png',
-                    scale: 4.sp,
-                    color: _selectedIndex == 0 ? maincolor : Colors.grey,
-                  ),
-                  label: 'Home',
-                ),
-                BottomNavigationBarItem(
-                  icon: Image.asset(
-                    'assets/Frame 5 (1).png',
-                    scale: 4.sp,
-                    color: _selectedIndex == 1 ? maincolor : Colors.grey,
-                  ),
-                  label: 'Reports',
-                ),
-                BottomNavigationBarItem(
-                  icon: Image.asset(
-                    chatIcon,
-                    scale: 4.sp,
-                    color: _selectedIndex == 2 ? maincolor : Colors.grey,
-                  ),
-                  label: 'Chats',
-                ),
-                BottomNavigationBarItem(
-                  icon: Image.asset(
-                    'assets/Profile.png',
-                    scale: 4.sp,
-                    color: _selectedIndex == 3 ? maincolor : Colors.grey,
-                  ),
-                  label: 'Profile',
-                ),
-              ],
-            ),
           ),
         ),
       ),

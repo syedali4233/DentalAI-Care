@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:fyp_project/utils/shared_preference_manager.dart';
 import 'package:fyp_project/utils/snack_bar.dart';
 import 'package:fyp_project/view/screens/auth_screens/sign_in_screen.dart';
 import 'package:fyp_project/view/screens/doctor_side/doctor_bottom_bar.dart';
+import 'package:http_parser/http_parser.dart';
 
 class AuthProvider extends ChangeNotifier {
   bool _isLoading = false;
@@ -185,6 +187,132 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       CustomSnackBarUtils.showTopSnackBar(e.toString(), Colors.redAccent);
       print("Error: $e");
+    }
+  }
+
+  Future<dynamic> uploadImage(File? image) async {
+    final http.StreamedResponse response;
+    dynamic responseJson;
+
+    try {
+      setLoading = true;
+
+      if (image == null) {
+        throw Exception('No image provided');
+      }
+
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+            'https://teeth-detetction-backend.onrender.com/api/user/upload-image'),
+      );
+
+      // Add the image file
+      final file = await http.MultipartFile.fromPath(
+        'image',
+        image.path,
+        contentType: MediaType('image', 'jpeg'),
+      );
+      request.files.add(file);
+
+      // Await the token because it's a Future
+      String? token =
+          await SharedPreferencesManager.getUserTokenFromSharedPreferences();
+
+      // Add headers (Authorization + Content-Type)
+      request.headers.addAll({
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'multipart/form-data',
+      });
+
+      // Send request
+      response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseString = await response.stream.bytesToString();
+        responseJson = json.decode(responseString);
+
+        CustomSnackBarUtils.showTopSnackBar(
+          responseJson['message'] ?? 'Image uploaded successfully',
+          Colors.green,
+        );
+
+        setLoading = false;
+        print("Image uploaded: ${responseJson['imageUrl']}");
+        print(responseJson);
+        print(response);
+        return responseJson;
+      } else {
+        setLoading = false;
+        throw Exception('Failed to upload image: ${response.statusCode}');
+      }
+    } catch (e) {
+      setLoading = false;
+      print('Something went wrong: $e');
+      rethrow;
+    }
+  }
+
+  Future<dynamic> dectectIMg(File? image) async {
+    final http.StreamedResponse response;
+    dynamic responseJson;
+
+    try {
+      setLoading = true;
+
+      if (image == null) {
+        throw Exception('No image provided');
+      }
+
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+            'https://teeth-detetction-backend.onrender.com/api/detection/teeth-detection'),
+      );
+
+      // Add the image file
+      final file = await http.MultipartFile.fromPath(
+        'image',
+        image.path,
+        contentType: MediaType('image', 'jpeg'),
+      );
+      request.files.add(file);
+
+      // Await the token because it's a Future
+      String? token =
+          await SharedPreferencesManager.getUserTokenFromSharedPreferences();
+
+      // Add headers (Authorization + Content-Type)
+      request.headers.addAll({
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'multipart/form-data',
+      });
+
+      // Send request
+      response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseString = await response.stream.bytesToString();
+        responseJson = json.decode(responseString);
+
+        CustomSnackBarUtils.showTopSnackBar(
+          responseJson['message'] ?? 'Image uploaded successfully',
+          Colors.green,
+        );
+
+        setLoading = false;
+        print("Image uploaded: ${responseJson['imageUrl']}");
+        print(responseJson);
+        print(response);
+        return responseJson;
+      } else {
+        setLoading = false;
+        throw Exception('Failed to upload image: ${response.statusCode}');
+      }
+    } catch (e) {
+      setLoading = false;
+      print('Something went wrong: $e');
+      rethrow;
     }
   }
 }

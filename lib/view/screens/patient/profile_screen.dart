@@ -8,8 +8,12 @@ import 'package:fyp_project/constants/colors.dart';
 import 'package:fyp_project/constants/extensions_for_sizedboxed.dart';
 import 'package:fyp_project/constants/images_path.dart';
 import 'package:fyp_project/constants/styles.dart';
+import 'package:fyp_project/model/appointment_model.dart';
+import 'package:fyp_project/utils/shared_preference_manager.dart';
 import 'package:fyp_project/utils/shimmer.dart';
+import 'package:fyp_project/view/screens/auth_screens/sign_in_screen.dart';
 import 'package:fyp_project/view/screens/doctor_side/doc_change_password.dart';
+import 'package:fyp_project/view/screens/patient/appointments_screen.dart';
 import 'package:fyp_project/view_model/auth_provider.dart';
 import 'package:fyp_project/view_model/profile_provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -59,9 +63,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
+      File file = File(pickedFile.path); // actual file
+
       setState(() {
-        _imageFile = File(pickedFile.path);
+        _imageFile = file;
       });
+
+      final provider = Provider.of<AuthProvider>(context, listen: false);
+      provider.uploadImage(file); // pass file object
     }
   }
 
@@ -88,15 +97,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Center(
                   child: Stack(
                     children: [
-                      CircleAvatar(
-                        radius: 60.r,
-                        backgroundColor: Colors.grey[300],
-                        backgroundImage:
-                            _imageFile != null ? FileImage(_imageFile!) : null,
-                        child: _imageFile == null
-                            ? Icon(Icons.person,
-                                size: 40.sp, color: Colors.white)
-                            : null,
+                      Consumer<ProfileProvider>(
+                        builder: (context, value, child) {
+                          if (value.userResponse == null) {
+                            return ShimmerComponents.profilePictureShimmer();
+                          }
+
+                          final user = value.userResponse!.userInfo;
+
+                          ImageProvider? backgroundImage;
+                          if (_imageFile != null) {
+                            backgroundImage = FileImage(_imageFile!);
+                          } else if (user.profileImage != null &&
+                              user.profileImage.isNotEmpty) {
+                            backgroundImage = NetworkImage(user.profileImage);
+                          }
+
+                          return CircleAvatar(
+                            radius: 60.r,
+                            backgroundColor: Colors.grey[300],
+                            backgroundImage: backgroundImage,
+                            child: backgroundImage == null
+                                ? Icon(Icons.person,
+                                    size: 40.sp, color: Colors.white)
+                                : null,
+                          );
+                        },
                       ),
                       Positioned(
                         bottom: 0,
@@ -130,84 +156,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 10.toHeight,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Column(
-                      children: [
-                        Image.asset(
-                          heartbeat,
-                          scale: 4.sp,
-                        ),
-                        Text(
-                          'Heart rate',
-                          style: TextStyle(color: maincolor, fontSize: 10.sp),
-                        ),
-                        Text(
-                          '215bpm',
-                          style: TextStyle(
-                              color: maincolor,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 40,
-                      child: VerticalDivider(
-                        color: maincolor,
-                        width: sqrt1_2,
-                        thickness: sqrt1_2,
-                      ),
-                    ),
-                    Column(
-                      children: [
-                        Image.asset(
-                          fire,
-                          scale: 4.sp,
-                        ),
-                        Text(
-                          'Calories',
-                          style: TextStyle(color: maincolor, fontSize: 10.sp),
-                        ),
-                        Text(
-                          '756cal',
-                          style: TextStyle(
-                              color: maincolor,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 40,
-                      child: VerticalDivider(
-                        color: maincolor,
-                        width: sqrt1_2,
-                        thickness: sqrt1_2,
-                      ),
-                    ),
-                    Column(
-                      children: [
-                        Image.asset(
-                          weight,
-                          scale: 4.sp,
-                        ),
-                        Text(
-                          'Weight',
-                          style: TextStyle(color: maincolor, fontSize: 10.sp),
-                        ),
-                        Text(
-                          '103Ibs',
-                          style: TextStyle(
-                              color: maincolor,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
                 30.toHeight,
                 ProfileScreenComponents(
                   title: 'Change Password',
@@ -216,7 +164,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const DocEditScreen()));
+                            builder: (context) => const DocChangePassword()));
                   },
                 ),
                 5.toHeight,
@@ -228,9 +176,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 5.toHeight,
-                const ProfileScreenComponents(
-                  title: 'Appointment',
-                  image: documnet,
+                ProfileScreenComponents(
+                  title: 'Appointments',
+                  image: profileHeart,
+                  ontap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AppointmentsScreen()));
+                  },
                 ),
                 5.toHeight,
                 SizedBox(
@@ -287,25 +241,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 5.toHeight,
-                const ProfileScreenComponents(
-                  title: 'FAQS',
-                  image: faqsImage,
-                ),
-                5.toHeight,
-                SizedBox(
-                  width: 300.w,
-                  child: Divider(
-                    // ignore: deprecated_member_use
-                    color: maincolor.withOpacity(0.2),
-                  ),
-                ),
-                5.toHeight,
                 ProfileScreenComponents(
                   title: 'Logout',
                   image: logoutIcon,
                   ontap: () {
-                    // Provider.of<AuthProvider>(context, listen: false)
-                    //     .logout(context);
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Confirm Logout"),
+                          content:
+                              const Text("Are you sure you want to log out?"),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context); // Close dialog
+                              },
+                              child: const Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                await SharedPreferencesManager
+                                    .removeUserDetailsFromSharedPreferences();
+
+                                Navigator.pop(context); // Close dialog
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const SignInScreen()),
+                                );
+                              },
+                              child: const Text("Logout"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                 ),
                 5.toHeight,

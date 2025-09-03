@@ -117,7 +117,7 @@ class _AccountTypeState extends State<AccountTypeScreen> {
                           });
                         },
                       ),
-                      Text('I am a Nurse', style: simpletext),
+                      Text('I am a Doctor', style: simpletext),
                     ],
                   )
                 ],

@@ -1,3 +1,3 @@
 import 'package:flutter/widgets.dart';
 
-const maincolor = Color(0xff407CE2);
+const maincolor = Color(0xff009FD8);

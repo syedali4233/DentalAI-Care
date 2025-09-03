@@ -15,14 +15,14 @@ import 'package:intl/intl.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:provider/provider.dart';
 
-class DocEditScreen extends StatefulWidget {
-  const DocEditScreen({super.key});
+class DocChangePassword extends StatefulWidget {
+  const DocChangePassword({super.key});
 
   @override
-  State<DocEditScreen> createState() => _DocEditScreenState();
+  State<DocChangePassword> createState() => _DocEditScreenState();
 }
 
-class _DocEditScreenState extends State<DocEditScreen> {
+class _DocEditScreenState extends State<DocChangePassword> {
   String initialCountry = 'PK';
   PhoneNumber number = PhoneNumber(isoCode: 'PK');
   TextEditingController newpassword = TextEditingController();
@@ -88,9 +88,9 @@ class _DocEditScreenState extends State<DocEditScreen> {
             );
           }
           final user = value.userResponse!.userInfo;
-          return SingleChildScrollView(
+          return Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              // mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 10.toHeight,
@@ -152,7 +152,7 @@ class _DocEditScreenState extends State<DocEditScreen> {
                               : Icons.visibility_off,
                           color: Colors.grey)),
                 ),
-                20.toHeight,
+                50.toHeight,
                 Consumer<AuthProvider>(
                   builder: (context, value, child) {
                     return ButtonComponent(

@@ -9,7 +9,7 @@ class TopDoctorComponent extends StatelessWidget {
   final String imagee;
   final String title;
   final String field;
-  final String rating;
+  final String? rating;
   final String locations;
   final VoidCallback ontapp;
   const TopDoctorComponent(
@@ -17,7 +17,7 @@ class TopDoctorComponent extends StatelessWidget {
       required this.imagee,
       required this.title,
       required this.field,
-      required this.rating,
+      this.rating,
       required this.ontapp,
       required this.locations});
 
@@ -44,7 +44,7 @@ class TopDoctorComponent extends StatelessWidget {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10.r),
                     image: DecorationImage(
-                        image: AssetImage(imagee), fit: BoxFit.fill),
+                        image: _resolveImage(imagee), fit: BoxFit.fill),
                     color: Colors.white),
               ),
               10.toWidth,
@@ -64,28 +64,28 @@ class TopDoctorComponent extends StatelessWidget {
                     style: simpletext.copyWith(fontSize: 10.sp),
                   ),
                   5.toHeight,
-                  Container(
-                    height: 20.h,
-                    width: 40.w,
-                    decoration: BoxDecoration(
-                        color: maincolor.withOpacity(0.4),
-                        borderRadius: BorderRadius.circular(5.r)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Image.asset(
-                          starRating,
-                          scale: 4.sp,
-                        ),
-                        Text(
-                          rating,
-                          style: simpletext.copyWith(
-                              color: maincolor, fontSize: 12.sp),
-                        )
-                      ],
-                    ),
-                  ),
-                  5.toHeight,
+                  // Container(
+                  //   height: 20.h,
+                  //   width: 40.w,
+                  //   decoration: BoxDecoration(
+                  //       color: maincolor.withOpacity(0.4),
+                  //       borderRadius: BorderRadius.circular(5.r)),
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  //     children: [
+                  //       Image.asset(
+                  //         starRating,
+                  //         scale: 4.sp,
+                  //       ),
+                  //       Text(
+                  //         rating!,
+                  //         style: simpletext.copyWith(
+                  //             color: maincolor, fontSize: 12.sp),
+                  //       )
+                  //     ],
+                  //   ),
+                  // ),
+                  25.toHeight,
                   Row(
                     children: [
                       Image.asset(
@@ -107,4 +107,14 @@ class TopDoctorComponent extends StatelessWidget {
       ),
     );
   }
+}
+
+ImageProvider _resolveImage(String pathOrUrl) {
+  if (pathOrUrl.isEmpty) {
+    return const AssetImage(maledoctor);
+  }
+  if (pathOrUrl.startsWith('http')) {
+    return NetworkImage(pathOrUrl);
+  }
+  return AssetImage(pathOrUrl);
 }

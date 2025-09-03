@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:ffi';
+
 import 'dart:io';
 
 import 'package:fyp_project/data/app_exceptions.dart';
@@ -139,5 +139,25 @@ class NetworkApiServices extends BaseApiServices {
       throw FetchDataException('$e');
     }
     return responseJson;
+  }
+
+  @override
+  Future authorizedPutApiWithBody(String url, String token) async {
+    try {
+      dynamic responseJson;
+      print(url);
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      print('response:$response');
+      responseJson = returnResponse(response);
+      print("cxz$responseJson");
+    } on SocketException catch (e) {
+      throw FetchDataException('$e');
+    }
   }
 }

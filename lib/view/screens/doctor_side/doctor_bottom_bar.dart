@@ -35,7 +35,7 @@ class _patientBottombarState extends State<DoctorpatientBottombar> {
   final List<Widget> _screens = [
     //  HomeScreen(),
     const HomeScreenDoc(),
-    const DocChatScreen(),
+    DocChatScreen(),
     const DocProfileScreen(),
   ];
 

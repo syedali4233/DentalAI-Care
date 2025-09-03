@@ -21,11 +21,14 @@ class DoctorsProvider extends ChangeNotifier {
 
   final _myrepo = DoctorsRespository();
   Future<void> getAlldoctors() async {
+    _doctorResponse = null;
+    notifyListeners();
     try {
       String? token =
           await SharedPreferencesManager.getUserTokenFromSharedPreferences();
       final value = await _myrepo.getDoctorsApi(token!);
       if (value != null) {
+        notifyListeners();
         _doctorResponse = DoctorsResponse.fromJson(value);
         print(_doctorResponse!.doctors);
       }
@@ -35,6 +38,8 @@ class DoctorsProvider extends ChangeNotifier {
   }
 
   Future<void> getSpecificDoc(String id) async {
+    specificDoctor = null;
+    notifyListeners();
     try {
       String? token =
           await SharedPreferencesManager.getUserTokenFromSharedPreferences();
@@ -80,6 +85,35 @@ class DoctorsProvider extends ChangeNotifier {
       }
     } catch (e) {
       print('${e.toString()}');
+    }
+  }
+
+  Future<void> acceptfuc(String id) async {
+    try {
+      final response = await _myrepo.getAcceptApi(id);
+      print(response);
+      notifyListeners();
+      await getAppointmentfuc();
+      return response;
+    } catch (e) {
+      print('${e.toString()}');
+      throw e;
+    }
+  }
+
+  Future<void> rejectfuc(String id) async {
+    try {
+      final response = await _myrepo.getrejectApi(id);
+      print("Reject Response: $response");
+
+      appointments?.appointments.removeWhere((a) => a.id == id);
+
+      notifyListeners();
+
+      return response;
+    } catch (e) {
+      print('Error in rejectfuc: ${e.toString()}');
+      throw e;
     }
   }
 }

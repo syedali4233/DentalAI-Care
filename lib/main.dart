@@ -6,9 +6,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fyp_project/splash_screen.dart';
 
 import 'package:fyp_project/view/screens/doctor_side/doc_change_password.dart';
+import 'package:fyp_project/view_model/appointments_provider.dart';
 import 'package:fyp_project/view_model/auth_provider.dart';
 import 'package:fyp_project/firebase_options.dart';
+import 'package:fyp_project/view_model/chat_provider.dart';
 import 'package:fyp_project/view_model/doctors_provider.dart';
+import 'package:fyp_project/view_model/get_conversation_provider.dart';
+import 'package:fyp_project/view_model/notification_provider.dart';
 import 'package:fyp_project/view_model/profile_provider.dart';
 
 import 'package:provider/provider.dart';
@@ -40,7 +44,11 @@ class MyApp extends StatelessWidget {
             providers: [
               ChangeNotifierProvider(create: (_) => AuthProvider()),
               ChangeNotifierProvider(create: (_) => ProfileProvider()),
-              ChangeNotifierProvider(create: (_) => DoctorsProvider())
+              ChangeNotifierProvider(create: (_) => DoctorsProvider()),
+              ChangeNotifierProvider(create: (_) => NotificationProvider()),
+              //   ChangeNotifierProvider(create: (_) => ChatProvider()),
+              ChangeNotifierProvider(create: (_) => GetConversationProvider()),
+              ChangeNotifierProvider(create: (_) => AppointmentsProvider()),
             ],
             child: MaterialApp(
                 navigatorKey: navigatorKey,

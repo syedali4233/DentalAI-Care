@@ -42,14 +42,25 @@ class _DoctorDetailsState extends State<DoctorDetails> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Provider.of<DoctorsProvider>(context, listen: false)
-        .getSpecificDoc(widget.id);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<DoctorsProvider>(context, listen: false)
+          .getSpecificDoc(widget.id);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        title: Text(
+          'Doctors Detail',
+          style: maintext,
+        ),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
@@ -57,25 +68,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                30.toHeight,
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Icon(Icons.arrow_back)),
-                      70.toWidth,
-                      Text(
-                        'Doctors Detail',
-                        style: maintext,
-                      )
-                    ],
-                  ),
-                ),
-                20.toHeight,
+                5.toHeight,
                 Consumer<DoctorsProvider>(
                   builder: (context, value, child) {
                     if (value.specificDoctor == null) {
@@ -95,9 +88,14 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                               width: 100.w,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10.r),
-                                  image: const DecorationImage(
-                                      image: AssetImage('assets/Image (7).png'),
-                                      fit: BoxFit.fill),
+                                  image: DecorationImage(
+                                    image:
+                                        doctor.profileImage.startsWith('http')
+                                            ? NetworkImage(doctor.profileImage)
+                                            : AssetImage(doctor.profileImage)
+                                                as ImageProvider,
+                                    fit: BoxFit.fill,
+                                  ),
                                   color: Colors.white),
                             ),
                             20.toWidth,
@@ -116,30 +114,30 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                   style: simpletext.copyWith(fontSize: 10.sp),
                                 ),
                                 8.toHeight,
-                                Container(
-                                  height: 20.h,
-                                  width: 40.w,
-                                  decoration: BoxDecoration(
-                                      // ignore: deprecated_member_use
-                                      color: maincolor.withOpacity(0.4),
-                                      borderRadius: BorderRadius.circular(5.r)),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Image.asset(
-                                        starRating,
-                                        scale: 4.sp,
-                                      ),
-                                      Text(
-                                        '4.7',
-                                        style: simpletext.copyWith(
-                                            color: maincolor, fontSize: 12.sp),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                8.toHeight,
+                                // Container(
+                                //   height: 20.h,
+                                //   width: 40.w,
+                                //   decoration: BoxDecoration(
+                                //       // ignore: deprecated_member_use
+                                //       color: maincolor.withOpacity(0.4),
+                                //       borderRadius: BorderRadius.circular(5.r)),
+                                //   child: Row(
+                                //     mainAxisAlignment:
+                                //         MainAxisAlignment.spaceEvenly,
+                                //     children: [
+                                //       Image.asset(
+                                //         starRating,
+                                //         scale: 4.sp,
+                                //       ),
+                                //       Text(
+                                //         '4.7',
+                                //         style: simpletext.copyWith(
+                                //             color: maincolor, fontSize: 12.sp),
+                                //       )
+                                //     ],
+                                //   ),
+                                // ),
+                                28.toHeight,
                                 Row(
                                   children: [
                                     Image.asset(

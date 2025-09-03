@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fyp_project/components/doctor_side_components/appointments_components.dart';
@@ -10,6 +8,10 @@ import 'package:fyp_project/constants/extensions_for_sizedboxed.dart';
 import 'package:fyp_project/constants/images_path.dart';
 import 'package:fyp_project/constants/styles.dart';
 import 'package:fyp_project/utils/shimmer.dart';
+import 'package:fyp_project/view/screens/doctor_side/detail_chat_screen_doc.dart';
+import 'package:fyp_project/view/screens/doctor_side/doc_chat_screen.dart';
+
+import 'package:fyp_project/view_model/auth_provider.dart';
 import 'package:fyp_project/view_model/doctors_provider.dart';
 import 'package:fyp_project/view_model/profile_provider.dart';
 import 'package:fyp_project/view/screens/patient/top_doctor_screen.dart';
@@ -111,14 +113,14 @@ class _HomeScreenState extends State<HomeScreenDoc> {
             ),
 
             // Female doctor on top right
-            Positioned(
-              top: 45.h,
-              right: 10.w,
-              child: Image.asset(
-                telescopePills,
-                scale: 4.sp,
-              ),
-            ),
+            // Positioned(
+            //   top: 45.h,
+            //   right: 10.w,
+            //   child: Image.asset(
+            //     telescopePills,
+            //     scale: 4.sp,
+            //   ),
+            // ),
 
             // Welcome content on top left
             Positioned(
@@ -127,10 +129,18 @@ class _HomeScreenState extends State<HomeScreenDoc> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    radius: 30.sp,
-                    backgroundColor: maincolor,
-                    backgroundImage: const AssetImage(maledoctor),
+                  Consumer<ProfileProvider>(
+                    builder: (context, value, child) {
+                      if (value.userResponse == null) {
+                        return ShimmerComponents.profilePictureShimmer();
+                      }
+                      final user = value.userResponse!.userInfo;
+                      return CircleAvatar(
+                        radius: 30.sp,
+                        backgroundColor: maincolor,
+                        backgroundImage: NetworkImage(user.profileImage),
+                      );
+                    },
                   ),
                   20.toHeight,
                   Text(
@@ -250,29 +260,100 @@ class _HomeScreenState extends State<HomeScreenDoc> {
                             if (value.appointments == null) {
                               return ShimmerComponents.cardShimmer();
                             }
-                            final appoint = value.appointments!.appointments;
-                            print(appoint);
+
+                            final allAppointments =
+                                value.appointments!.appointments;
+
+                            // Split appointments based on status
+                            final completedAppointments = allAppointments
+                                .where((a) => a.status == "confirmed")
+                                .toList();
+                            final requestAppointments = allAppointments
+                                .where((a) => a.status != "confirmed")
+                                .toList();
+
+                            // Decide which list to show based on toggle
+                            final currentList = istap
+                                ? requestAppointments
+                                : completedAppointments;
+
+                            if (currentList.isEmpty) {
+                              return Center(
+                                child: Text(
+                                  istap
+                                      ? "No Appointment Requests"
+                                      : "No Completed Appointments",
+                                  style: simpletext,
+                                ),
+                              );
+                            }
+
                             return ListView.builder(
-                                shrinkWrap: true, // <— very important
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: appoint.length,
-                                itemBuilder: (context, index) {
-                                  final appointm =
-                                      value.appointments!.appointments[index];
-                                  final articleview = appoints[index];
-                                  return Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(vertical: 5.h),
-                                    child: AppointmentsComponents(
-                                      title:
-                                          "${appointm.patient.firstName} ${appointm.patient.lastName}",
-                                      date: appointm.time,
-                                      read: appointm.date.toString(),
-                                      imagee: articleview['image'],
-                                      onclicked: istap,
-                                    ),
-                                  );
-                                });
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: currentList.length,
+                              itemBuilder: (context, index) {
+                                final appointm = currentList[index];
+                                final articleview =
+                                    appoints[index % appoints.length];
+
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 5.h),
+                                  child: AppointmentsComponents(
+                                    ontap: () {
+                                      final completedAppointments =
+                                          allAppointments
+                                              .where((a) =>
+                                                  a.status == "confirmed")
+                                              .toList();
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DocChatScreen()));
+                                    },
+                                    title:
+                                        "${appointm.patient.firstName} ${appointm.patient.lastName}",
+                                    date: appointm.time,
+                                    read: appointm.date.toString(),
+                                    imagee: appointm.patient.profileImage ??
+                                        articleview['image'],
+                                    onclicked:
+                                        istap, // show buttons only when istap = true
+                                    accept: () {
+                                      value.acceptfuc(appointm.id);
+                                      print("Accepted ${appointm.id}");
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DetailChatScreenDoc(
+                                            chat: {
+                                              "conversationId":
+                                                  "68ade3ceaab5e14f7c0b82ed_68af07dc0dbe6318201004e9",
+                                              "receiverId": appointm.patient.id,
+                                              "name":
+                                                  "${appointm.patient.firstName} ${appointm.patient.lastName}",
+                                              "image": appointm
+                                                      .patient.profileImage ??
+                                                  femalePatient,
+                                              "senderId": appointm.doctorId
+                                            },
+                                          ),
+                                        ),
+                                      );
+
+                                      // Add accept logic here
+                                    },
+                                    reject: () {
+                                      value.rejectfuc(appointm.id);
+                                      print("Rejected ${appointm.id}");
+                                      // Add reject logic here
+                                    },
+                                  ),
+                                );
+                              },
+                            );
                           },
                         )
                       ],

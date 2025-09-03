@@ -54,4 +54,38 @@ class DoctorsRespository {
       print('${e.toString()}');
     }
   }
+
+  Future<dynamic> getAcceptApi(
+    String id,
+  ) async {
+    try {
+      String? token =
+          await SharedPreferencesManager.getUserTokenFromSharedPreferences();
+      final response = await _apiServices.authorizedPutApiWithBody(
+        '${Constants.baseUrl}${Constants.acceptUrl}${id}',
+        token!,
+      );
+      return response;
+    } catch (e) {
+      print('${e.toString()}');
+      throw e;
+    }
+  }
+
+  Future<dynamic> getrejectApi(
+    String id,
+  ) async {
+    try {
+      String? token =
+          await SharedPreferencesManager.getUserTokenFromSharedPreferences();
+      final response = await _apiServices.authorizedPutApiWithBody(
+        '${Constants.baseUrl}${Constants.rejectUrl}${id}',
+        token!,
+      );
+      return response;
+    } catch (e) {
+      print('${e.toString()}');
+      throw e;
+    }
+  }
 }

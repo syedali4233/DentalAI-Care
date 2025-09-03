@@ -58,36 +58,29 @@ class _TopDoctorScreenState extends State<TopDoctorScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Provider.of<DoctorsProvider>(context, listen: false).getAlldoctors();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<DoctorsProvider>(context, listen: false).getAlldoctors();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        title: Text(
+          'Top Doctors',
+          style: maintext,
+        ),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              30.toHeight,
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Icon(Icons.arrow_back)),
-                    70.toWidth,
-                    Text(
-                      'Top Doctors',
-                      style: maintext,
-                    )
-                  ],
-                ),
-              ),
-              20.toHeight,
+              5.toHeight,
               Consumer<DoctorsProvider>(
                 builder: (context, value, child) {
                   if (value.doctorResponse == null) {
@@ -119,7 +112,8 @@ class _TopDoctorScreenState extends State<TopDoctorScreen> {
                               ),
                             );
                           },
-                          imagee: maledoctor, // ✅ Object property
+                          imagee: doctor.profileImage ??
+                              maledoctor, // ✅ Object property
                           title:
                               "Dr. ${doctor.firstName ?? ''} ${doctor.lastName ?? ''}",
                           field: doctor.email ?? 'N/A',

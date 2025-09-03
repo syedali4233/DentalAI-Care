@@ -1,6 +1,6 @@
 class Constants {
   // base url
-  static const baseUrl = 'https://2ea3fa11815c.ngrok-free.app';
+  static const baseUrl = 'https://teeth-detetction-backend.onrender.com';
 
 // auth end points
 
@@ -14,4 +14,12 @@ class Constants {
   static const getDoctorsUrl = '/api/patient/doctors';
   static const bookAppointmentUrl = '/api/patient/book-appointment/';
   static const getAppointmentsUrl = '/api/doctor/appoinments';
+  static const notificationUrl = '/api/notification/notifications';
+  static const acceptUrl = '/api/doctor/appointment/';
+  static const rejectUrl = '/api/doctor/reject/';
+  static const uploadUrl = '/user/upload-image';
+  static const sendmsgUrl = '/api/chat/send';
+  static const getconUrl = '/api/chat/conversations';
+  static const gethistoryUrl = '/api/chat/history/';
+  static const apppointsUrl = '/api/patient/all-appoinments';
 }
